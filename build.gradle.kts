@@ -415,6 +415,8 @@ rootProject.dependencies {
     implementation(project(":here-naksha-app-service"))
 }
 rootProject.tasks.shadowJar {
+    //Have all tests run before building the fat jar
+    dependsOn(allprojects.flatMap { it.tasks.withType(Test::class) })
     archiveClassifier.set("all")
     mergeServiceFiles()
     isZip64 = true
