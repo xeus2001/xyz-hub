@@ -21,6 +21,8 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
     // Don't apply for all projects, we individually only apply where Kotlin is used.
     kotlin("jvm") version "1.8.21" apply false
+    // overall code coverage
+    jacoco
 }
 
 group = "com.here.naksha"
@@ -105,6 +107,13 @@ val mavenUser = rootProject.properties["mavenUser"] as String
 val mavenPassword = rootProject.properties["mavenPassword"] as String
 
 /*
+    Overall coverage of subproject - it might be different for different subprojects
+    Configurable per project - see `setOverallCoverage`
+ */
+val minOverallCoverageKey: String = "minOverallCoverage"
+val defaultOverallMinCoverage: Double = 0.8 // Don't decrease me!
+
+/*
 
     IMPORTANT: api vs implementation
 
@@ -125,6 +134,7 @@ subprojects {
     apply(plugin = "java")
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "java-library")
+    apply(plugin = "jacoco")
 
     repositories {
         maven(uri("https://repo.osgeo.org/repository/release/"))
@@ -168,6 +178,7 @@ subprojects {
     }
 
     tasks {
+
         test {
             maxHeapSize = "4g"
             useJUnitPlatform()
@@ -185,17 +196,35 @@ subprojects {
                 addStringOption("Xmaxwarns", "1")
             }
         }
+
+        jacocoTestReport {
+            dependsOn(test)
+            reports {
+                xml.required = true
+            }
+        }
+
+        jacocoTestCoverageVerification {
+            dependsOn(jacocoTestReport)
+            violationRules {
+                rule {
+                    limit {
+                        minimum = getOverallCoverage().toBigDecimal()
+                    }
+                }
+            }
+        }
     }
 
     java {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    
+
     testing {
         dependencies {
             implementation(slf4j_console)
-        } 
+        }
     }
 
     // Fix transitive dependencies.
@@ -253,6 +282,7 @@ project(":here-naksha-lib-core") {
         implementation(vividsolutions_jts_core)
         implementation(google_flatbuffers)
     }
+    setOverallCoverage(0.3) // only increasing allowed!
 }
 
 project(":here-naksha-lib-heapcache") {
@@ -266,6 +296,7 @@ project(":here-naksha-lib-heapcache") {
         testImplementation("org.mockito:mockito-core:3.12.4")
         implementation(vividsolutions_jts_core)
     }
+    setOverallCoverage(0.5) // only increasing allowed!
 }
 
 project(":here-naksha-lib-psql") {
@@ -283,6 +314,7 @@ project(":here-naksha-lib-psql") {
         implementation(commons_dbutils)
         implementation(vividsolutions_jts_core)
     }
+    setOverallCoverage(0.0) // only increasing allowed!
 }
 
 project(":here-naksha-lib-extension") {
@@ -290,6 +322,7 @@ project(":here-naksha-lib-extension") {
     dependencies {
         api(project(":here-naksha-lib-core"))
     }
+    setOverallCoverage(0.4) // only increasing allowed!
 }
 
 project(":here-naksha-handler-activitylog") {
@@ -301,6 +334,7 @@ project(":here-naksha-handler-activitylog") {
         implementation(flipkart_zjsonpatch)
         testImplementation(jayway_jsonpath)
     }
+    setOverallCoverage(0.4) // only increasing allowed!
 }
 
 project(":here-naksha-handler-http") {
@@ -373,6 +407,7 @@ try {
         dependencies {
             testImplementation(json_assert)
         }
+        setOverallCoverage(0.25) // only increasing allowed!
     }
 } catch (ignore: UnknownProjectException) {
 }
@@ -423,5 +458,19 @@ rootProject.tasks.shadowJar {
     manifest {
         attributes["Implementation-Title"] = "Naksha Service"
         attributes["Main-Class"] = "com.here.naksha.app.service.NakshaHub"
+    }
+}
+
+
+fun Project.setOverallCoverage(minOverallCoverage: Double) {
+    ext.set(minOverallCoverageKey, minOverallCoverage)
+}
+
+fun Project.getOverallCoverage(): Double {
+    return if (ext.has(minOverallCoverageKey)) {
+        ext.get(minOverallCoverageKey) as? Double
+                ?: throw IllegalStateException("Property '$minOverallCoverageKey' is expected to be Double")
+    } else {
+        defaultOverallMinCoverage
     }
 }
