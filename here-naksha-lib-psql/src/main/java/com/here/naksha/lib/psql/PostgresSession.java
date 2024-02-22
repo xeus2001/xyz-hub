@@ -493,17 +493,22 @@ final class PostgresSession extends ClosableChildResource<PostgresStorage> {
         }
       }
       final String query = sql.toString();
+      long startTS = System.currentTimeMillis();
       final PreparedStatement stmt = prepareStatement(query);
+      log.info("Statement got prepared in [{}] msec", System.currentTimeMillis() - startTS);
       try {
         int lastParamIdx = fillStatementWithParams(stmt, wkbs, parameters, 1, collections.size());
         if (readFeatures.isReturnAllVersions()) {
           fillStatementWithParams(stmt, wkbs, parametersHst, lastParamIdx, 1);
         }
+        log.info("Statement to be executed [{}]", stmt);
         final ResultSet rs = stmt.executeQuery();
         final PsqlCursor<XyzFeature, XyzFeatureCodec> cursor =
             new PsqlCursor<>(XyzFeatureCodecFactory.get(), this, stmt, rs);
+        log.info("DURATION Took {} msec before returning result", System.currentTimeMillis() - startTS);
         return new PsqlSuccess(cursor);
       } catch (SQLException e) {
+        log.info("DURATION Took {} msec before resulting into error", System.currentTimeMillis() - startTS);
         try {
           stmt.close();
         } catch (SQLException ce) {

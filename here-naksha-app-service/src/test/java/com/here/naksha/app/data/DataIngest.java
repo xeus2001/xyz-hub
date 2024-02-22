@@ -33,7 +33,7 @@ public class DataIngest extends AbstractDataIngest {
   //  If you change the flag here, then ensure appropriate variables are set
   //  in respective ingestXXXData() functions
   private static final boolean TOPOLOGY_INGEST_ENABLED = false;
-  private static final boolean TOPOLOGY_VIOLATION_INGEST_ENABLED = false;
+  private static final boolean TOPOLOGY_VIOLATION_INGEST_ENABLED = true;
 
   private static boolean topologyIngestEnabled() {
     return TOPOLOGY_INGEST_ENABLED;
@@ -48,7 +48,7 @@ public class DataIngest extends AbstractDataIngest {
   void ingestTopologyData() throws Exception {
     setNHUrl(nhUrl);
     setNHToken(nhToken);
-    setNHSpaceId(nhSpaceId);
+    setNHSpaceId("urn:here:naksha:mod-local:space:topology-consistent");
     setReqBatchSize(Integer.parseInt(DEF_BATCH_SIZE));
     setNakshaClient(new NakshaTestWebClient(nhUrl, 10, 90));
 
@@ -62,7 +62,7 @@ public class DataIngest extends AbstractDataIngest {
   void ingestTopologyViolationData() throws Exception {
     setNHUrl(nhUrl);
     setNHToken(nhToken);
-    setNHSpaceId(nhSpaceId);
+    setNHSpaceId("urn:here:naksha:mod-local:space:topology-violation-base");
     setReqBatchSize(Integer.parseInt(DEF_BATCH_SIZE));
     setNakshaClient(new NakshaTestWebClient(nhUrl, 10, 90));
 
