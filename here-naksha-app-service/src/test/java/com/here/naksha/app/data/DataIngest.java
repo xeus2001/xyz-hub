@@ -33,7 +33,7 @@ public class DataIngest extends AbstractDataIngest {
   //  If you change the flag here, then ensure appropriate variables are set
   //  in respective ingestXXXData() functions
   private static final boolean TOPOLOGY_INGEST_ENABLED = false;
-  private static final boolean TOPOLOGY_VIOLATION_INGEST_ENABLED = true;
+  private static final boolean TOPOLOGY_VIOLATION_INGEST_ENABLED = false;
 
   private static boolean topologyIngestEnabled() {
     return TOPOLOGY_INGEST_ENABLED;
