@@ -27,15 +27,13 @@ import naksha.base.Platform;
 import naksha.base.TupleNumber;
 import naksha.base.Version;
 import naksha.jbon.JbDictionary;
-import naksha.model.AbstractStorage;
-import naksha.model.IReadSession;
-import naksha.model.IWriteSession;
-import naksha.model.NakshaContext;
-import naksha.model.SessionOptions;
+import naksha.model.*;
 import naksha.model.objects.NakshaStorage;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static naksha.base.NakshaExceptionKt.unsupportedOp;
 
 
 public class HttpStorage extends AbstractStorage<NakshaStorage> {
@@ -166,5 +164,10 @@ public class HttpStorage extends AbstractStorage<NakshaStorage> {
   @Override
   public @NotNull KClass<NakshaStorage> getConfigKlass() {
     return Platform.klassFor(NakshaStorage.class);
+  }
+
+  @Override
+  public @NotNull IStreamSession newStreamSession(@Nullable SessionOptions options) {
+    throw unsupportedOp("newStreamSession");
   }
 }

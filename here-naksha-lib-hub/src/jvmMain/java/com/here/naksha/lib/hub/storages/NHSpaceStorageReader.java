@@ -20,6 +20,7 @@ package com.here.naksha.lib.hub.storages;
 
 import static com.here.naksha.lib.core.HubInternalIdentifiers.EVENT_HANDLERS;
 import static com.here.naksha.lib.core.HubInternalIdentifiers.SPACES;
+import static naksha.base.NakshaExceptionKt.unsupportedOp;
 import static naksha.model.util.RequestHelper.readFeaturesByIdRequest;
 import static naksha.model.util.RequestHelper.readFeaturesByIdsRequest;
 import static naksha.model.util.ResultHelper.readFeatureFromResponse;
@@ -98,15 +99,13 @@ public class NHSpaceStorageReader implements IReadSession {
    * @return the result.
    */
   @Override
-  @ApiStatus.AvailableSince(NakshaVersion.v2_0_7)
-  public @NotNull Response execute(final @NotNull Request request) {
+  public @NotNull Response executeRead(@NotNull ReadRequest request) {
     if (request instanceof ReadFeatures readFeatures) {
       return executeReadFeatures(readFeatures);
     } else if (request instanceof ReadCollections readCollections) {
       return executeReadFeatures(readCollections.toReadFeatures());
     }
-    throw new UnsupportedOperationException(
-        "Request with unsupported type " + request.getClass().getName());
+    throw unsupportedOp("Request with unsupported type " + request.getClass().getName());
   }
 
   private @NotNull Response executeReadFeatures(final @NotNull ReadFeatures rf) {
@@ -297,13 +296,6 @@ public class NHSpaceStorageReader implements IReadSession {
     throw NOT_SUPPORTED_ERROR;
   }
 
-  @NotNull
-  @Override
-  public Response executeParallel(@NotNull Request request) {
-    throw new NakshaException(
-        new NakshaError(NakshaError.NOT_IMPLEMENTED, "parallel execution not supported for NHSpace"));
-  }
-
   @Override
   public @NotNull IStorage getStorage() {
     throw NOT_SUPPORTED_ERROR;
@@ -316,11 +308,6 @@ public class NHSpaceStorageReader implements IReadSession {
 
   @Override
   public @Nullable NakshaCatalog getCatalogById(@NotNull String catalogId, boolean allowTombstone) {
-    throw NOT_SUPPORTED_ERROR;
-  }
-
-  @Override
-  public @NotNull naksha.model.MemberProcessorMap getProcessors() {
     throw NOT_SUPPORTED_ERROR;
   }
 

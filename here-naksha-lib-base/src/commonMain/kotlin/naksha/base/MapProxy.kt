@@ -15,6 +15,7 @@ import naksha.base.PlatformMapApi.PlatformMapApiCompanion.map_size
 import naksha.base.fn.Fn2
 import kotlin.collections.MutableMap.MutableEntry
 import kotlin.js.JsExport
+import kotlin.jvm.JvmOverloads
 import kotlin.reflect.KClass
 
 /**
@@ -250,6 +251,23 @@ open class MapProxy<K : Any, V : Any>(val keyKlass: KClass<out K>, val valueKlas
         toValue(key, map_set(platformObject(), key, unbox(value)))
 
     override fun get(key: K): V? = toValue(key, map_get(platformObject(), key))
+
+    /**
+     * Returns the value of the given _key_ as [Id]. If the value assigned to _key_ is a [String], the method converts it into an [Id] instance.
+     * @param key the key from which to read the value.
+     * @param update if _true_ and the value was converted into an [Id], the key is reassigned to the new [Id] instance so the same convert has not to be done again. Defaults to _false_.
+     * @return the value assigned to the given _key_ as [Id] or `null`, if the value is no valid [Id].
+     * @since 3.0
+     */
+    @JvmOverloads
+    fun getId(key: K, update: Boolean = false): Id? {
+        val v = map_get(platformObject(), key)
+        if (v is Id) return v
+        if (v !is String) return null
+        val id = Id(v)
+        if (update) map_set(platformObject(), id, v)
+        return id
+    }
 
     /**
      * Returns the raw value stored in the underlying base map.

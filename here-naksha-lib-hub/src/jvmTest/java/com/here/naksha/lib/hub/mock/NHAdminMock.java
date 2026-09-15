@@ -21,6 +21,7 @@ package com.here.naksha.lib.hub.mock;
 import static com.here.naksha.lib.core.HubInternalIdentifiers.ALL_HUB_INTERNAL_COLLECTIONS;
 import static com.here.naksha.lib.core.HubInternalIdentifiers.CONFIGS;
 import static com.here.naksha.lib.core.exceptions.UncheckedException.unchecked;
+import static naksha.base.NakshaExceptionKt.unsupportedOp;
 import static naksha.model.util.RequestHelper.createFeatureRequest;
 
 import com.here.naksha.lib.hub.NakshaHubAdminStorageIdentifiers;
@@ -33,12 +34,8 @@ import kotlin.reflect.KClass;
 import naksha.base.Platform;
 import naksha.base.PlatformLock;
 import naksha.jbon.JbDictionary;
-import naksha.model.AbstractStorage;
-import naksha.model.IReadSession;
-import naksha.model.IWriteSession;
-import naksha.model.NakshaContext;
+import naksha.model.*;
 import naksha.base.NakshaError;
-import naksha.model.SessionOptions;
 import naksha.model.objects.NakshaCollection;
 import naksha.model.objects.NakshaFeature;
 import naksha.model.objects.NakshaStorage;
@@ -72,6 +69,11 @@ public class NHAdminMock extends AbstractStorage<Config> {
   @Override
   protected void shutdownStorage(boolean dropCache) {
     // empty on purpose
+  }
+
+  @Override
+  public @NotNull IStreamSession newStreamSession(@Nullable SessionOptions options) {
+    throw unsupportedOp("newStreamSession");
   }
 
   public static class Config extends NakshaStorage {

@@ -2,7 +2,7 @@
 
 package naksha.base
 
-actual class NakshaException actual constructor(actual val error: NakshaError) : RuntimeException(error.msg, error.cause) {
+actual open class NakshaException actual constructor(actual val error: NakshaError) : RuntimeException(error.msg, error.cause) {
     actual constructor(code: String, msg: String, cause: Throwable?) : this(NakshaError(code, msg, cause))
     actual constructor(code: String, msg: String) : this(NakshaError(code, msg, null))
 }

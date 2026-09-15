@@ -257,7 +257,18 @@ allprojects {
         val jsNoduleConfig = jsModules[_name]
         pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
             extensions.configure<KotlinMultiplatformExtension> {
-                jvm {}
+                compilerOptions {
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                    freeCompilerArgs.add("-opt-in=kotlin.ExperimentalUnsignedTypes,kotlin.RequiresOptIn,kotlin.js.ExperimentalJsExport,kotlin.js.ExperimentalJsStatic")
+                    freeCompilerArgs.add("-Xes-long-as-bigint")
+                    freeCompilerArgs.add("-XXLanguage:+JsAllowLongInExportedDeclarations")
+                }
+                jvm {
+                    compilerOptions {
+                        freeCompilerArgs.add("-Xexpect-actual-classes")
+                        freeCompilerArgs.add("-opt-in=kotlin.ExperimentalUnsignedTypes,kotlin.RequiresOptIn")
+                    }
+                }
                 jvmToolchain(jvmToolchainVersion.toInt())
                 if (jsNoduleConfig != null) {
                     val _moduleName = jsNoduleConfig._moduleName
@@ -266,7 +277,10 @@ allprojects {
                         outputModuleName = _moduleName
                         useEsModules()
                         compilerOptions {
+                            // See: https://kotlinlang.org/docs/js-to-kotlin-interop.html#use-bigint-type-to-represent-kotlin-s-long-type
                             target = "es2015"
+                            freeCompilerArgs.add("-Xexpect-actual-classes")
+                            freeCompilerArgs.add("-opt-in=kotlin.ExperimentalUnsignedTypes,kotlin.RequiresOptIn,kotlin.js.ExperimentalJsExport,kotlin.js.ExperimentalJsStatic")
                             freeCompilerArgs.add("-Xes-long-as-bigint")
                             freeCompilerArgs.add("-XXLanguage:+JsAllowLongInExportedDeclarations")
                         }

@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import naksha.model.ILock;
 import naksha.model.IWriteSession;
+import naksha.model.MemberProcessorMap;
 import naksha.model.Naksha;
 import naksha.base.NakshaError;
 import naksha.base.NakshaException;
@@ -47,25 +48,19 @@ public class NHAdminWriterMock extends NHAdminReaderMock implements IWriteSessio
   }
 
   @Override
-  public @NotNull Response execute(@NotNull Request request) {
-    if (request instanceof WriteRequest wr) {
-      for (Write write : wr.getWrites()) {
-        Response singularResponse;
-        if (Naksha.COLLECTIONS_COL_ID.equals(write.getCollectionId())) {
-          singularResponse = executeWriteCollection(write);
-        } else {
-          singularResponse = executeWriteFeature(write);
-        }
-        if (singularResponse instanceof ErrorResponse){
-          return singularResponse;
-        }
+  public @NotNull Response executeWrite(@NotNull WriteRequest request) {
+    for (Write write : request.getWrites()) {
+      Response singularResponse;
+      if (Naksha.COLLECTIONS_COL_ID.equals(write.getCollectionId())) {
+        singularResponse = executeWriteCollection(write);
+      } else {
+        singularResponse = executeWriteFeature(write);
       }
-      return new SuccessResponse();
-    } else {
-      return new ErrorResponse(
-          new NakshaError(NakshaError.UNSUPPORTED_OPERATION,
-              "WriteRequest type " + request.getClass().getName() + " not supported"));
+      if (singularResponse instanceof ErrorResponse){
+        return singularResponse;
+      }
     }
+    return new SuccessResponse();
   }
 
   private Response executeWriteCollection(Write write) {
@@ -255,5 +250,12 @@ public class NHAdminWriterMock extends NHAdminReaderMock implements IWriteSessio
   @Override
   public @Nullable NakshaTx getTransaction() {
     return null;
+  }
+
+  private final @NotNull MemberProcessorMap processors = new MemberProcessorMap();
+
+  @Override
+  public @NotNull MemberProcessorMap getProcessors() {
+    return processors;
   }
 }

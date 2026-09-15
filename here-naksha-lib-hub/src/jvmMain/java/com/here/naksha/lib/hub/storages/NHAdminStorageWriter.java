@@ -22,6 +22,8 @@ import naksha.model.ILock;
 import naksha.model.IWriteSession;
 import naksha.model.NakshaVersion;
 import naksha.model.objects.NakshaTx;
+import naksha.model.request.Response;
+import naksha.model.request.WriteRequest;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,5 +69,15 @@ public class NHAdminStorageWriter extends NHAdminStorageReader implements IWrite
   @Override
   public @Nullable NakshaTx getTransaction() {
     return session.getTransaction();
+  }
+
+  @Override
+  public @NotNull naksha.model.MemberProcessorMap getProcessors() {
+    return session.getProcessors();
+  }
+
+  @Override
+  public @NotNull Response executeWrite(@NotNull WriteRequest request) {
+    return session.executeWrite(request);
   }
 }

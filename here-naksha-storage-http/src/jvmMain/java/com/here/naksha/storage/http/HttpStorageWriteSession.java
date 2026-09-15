@@ -3,12 +3,12 @@ package com.here.naksha.storage.http;
 import com.here.naksha.storage.http.connector.ConnectorInterfaceWriteExecute;
 import naksha.model.ILock;
 import naksha.model.IWriteSession;
+import naksha.model.MemberProcessorMap;
 import naksha.model.NakshaContext;
 import naksha.base.NakshaError;
 import naksha.base.NakshaException;
 import naksha.model.objects.NakshaTx;
 import naksha.model.request.ErrorResponse;
-import naksha.model.request.Request;
 import naksha.model.request.Response;
 import naksha.model.request.WriteRequest;
 import org.jetbrains.annotations.NotNull;
@@ -29,20 +29,18 @@ public class HttpStorageWriteSession extends HttpStorageReadSession implements I
     }
 
     @Override
-    public @NotNull Response execute(@NotNull Request writeRequest) {
+    public @NotNull Response executeWrite(@NotNull WriteRequest request) {
         try {
             switch (httpInterface) {
                 case ffwAdapter:
-                    return new ErrorResponse(
-                            NakshaError.NOT_IMPLEMENTED, "Writing not supported by underlying storage");
+                    return new ErrorResponse(NakshaError.NOT_IMPLEMENTED, "Writing not supported by underlying storage");
                 case dataHubConnector:
-                    return new ConnectorInterfaceWriteExecute(
-                            getNakshaContext(), (WriteRequest) writeRequest, getRequestSender())
-                            .execute();
+                    return new ConnectorInterfaceWriteExecute(getNakshaContext(), request, getRequestSender()).execute();
                 default:
                     throw new IllegalStateException("Unsupported HTTP interface: " + httpInterface);
             }
         } catch (NakshaException e) {
+            log.info("Unexpected error while executing write", e);
             return new ErrorResponse(e.getError());
         } catch (UnsupportedOperationException e) {
             return new ErrorResponse(NakshaError.NOT_IMPLEMENTED, e.getMessage(), e);
@@ -80,5 +78,12 @@ public class HttpStorageWriteSession extends HttpStorageReadSession implements I
     @Override
     public @Nullable NakshaTx getTransaction() {
         return null;
+    }
+
+    private final @NotNull MemberProcessorMap processors = new MemberProcessorMap();
+
+    @Override
+    public @NotNull MemberProcessorMap getProcessors() {
+        return processors;
     }
 }

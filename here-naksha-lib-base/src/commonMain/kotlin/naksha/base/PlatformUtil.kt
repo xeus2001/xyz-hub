@@ -4,7 +4,9 @@ import naksha.base.Platform.PlatformCompanion.random
 import kotlin.js.JsExport
 import kotlin.js.JsStatic
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
+import kotlin.text.toInt
 
 /**
  * All utility functions that work cross-platform.
@@ -104,10 +106,12 @@ class PlatformUtil {
          */
         @JsStatic
         @JvmField
+        @Deprecated("DataView is deprecated")
         var defaultDataViewSize = 128
 
         /**
          * An array with the Web-Safe Base-64 characters.
+         * @since 3.0
          */
         @JvmStatic
         private val randomCharacters = CharArray(64) {
@@ -127,11 +131,14 @@ class PlatformUtil {
          * only out of `a` to `z`, `A` to `Z`, `0` to `9`.
          * @param length The amount of characters to return, if less than or equal zero, 12 characters are used.
          * @return The random string.
+         * @see randomBase64String
+         * @see randomAtoZ
          */
         @JvmStatic
         @JsStatic
+        @Deprecated("This is not a balanced randomness", replaceWith = ReplaceWith("randomAtoZ()"))
         fun randomString(length: Int = 12): String {
-            // This way, in Javascript, we catch undefined.
+            // This way, in JavaScript, we catch undefined.
             val end = if (length >= 1) length else 12
             val chars = randomCharacters
             val sb = StringBuilder()
@@ -143,6 +150,77 @@ class PlatformUtil {
             while (++pos < end) {
                 i = (random() * 64.0).toInt()
                 sb.append(chars[i and 63])
+            }
+            return sb.toString()
+        }
+
+        /**
+         * An array with the Web-Safe Base-64 characters, `A-Za-z0-9-_`.
+         * @since 3.0
+         */
+        private val base64Characters = CharArray(64) {
+            when (it) {
+                in 0..25 -> ('A'.code + (it - 0)).toChar()
+                in 26..51 -> ('a'.code + (it - 26)).toChar()
+                in 52..61 -> ('0'.code + (it - 52)).toChar()
+                // This duplicates a and z, but we for random strings we do not care that much
+                62 -> '-'
+                63 -> '_'
+                else -> throw internalError("Compiler error")
+            }
+        }
+
+        /**
+         * An array with characters from `a` to `z`.
+         * @since 3.0
+         */
+        private val aToZ = CharArray(26) { ('a'.code + it).toChar() }
+
+        /**
+         * Generates a random string only out of `a` to `z` characters.
+         * @param length The amount of characters to return, if less than or equal zero, 12 characters are used.
+         * @return The random string.
+         * @since 3.0
+         */
+        @JvmStatic
+        @JsStatic
+        fun randomBase64String(length: Int = 12): String {
+            // This way, in JavaScript, we catch undefined.
+            val end = if (length >= 1) length else 12
+            val chars = base64Characters
+            val sb = StringBuilder()
+            var pos = 0
+            var i = (random() * chars.size).toInt()
+            // The first character should not be '0' to '9', '-' or '_'!
+            while (i >= 52) i = (random() * chars.size).toInt()
+            sb.append(chars[i and 63])
+            while (++pos < end) {
+                i = (random() * chars.size).toInt()
+                sb.append(chars[i and 63])
+            }
+            return sb.toString()
+        }
+
+        /**
+         * Generates a random string persisting only out of `a` to `z` characters.
+         *
+         * For the default length of 12 characters, there are ninety-five quadrillion _(95,428,956,661,682,200)_ possible combinations.
+         * @param length The amount of characters to return, if less than or equal zero, 12 characters are used.
+         * @return The random string.
+         * @since 3.0
+         */
+        @JvmStatic
+        @JsStatic
+        @JvmOverloads
+        fun randomAtoZ(length: Int = 12): String {
+            // This way, in JavaScript, we catch undefined.
+            val end = if (length >= 1) length else 12
+            val chars = aToZ
+            val sb = StringBuilder()
+            for (pos in 0 until end) {
+                val i = (random() * chars.size).toInt() % chars.size
+                require(i in chars.indices) { "Invalid value in random string: $i" }
+                sb.append(chars[i])
             }
             return sb.toString()
         }

@@ -5,6 +5,7 @@ package naksha.psql
 import naksha.base.fn.Fx2
 import naksha.jbon.JbDictionary
 import naksha.model.DataEncoding
+import naksha.model.IStreamSession
 import naksha.model.SessionOptions
 import kotlin.reflect.KClass
 
@@ -37,6 +38,10 @@ class Plv8Storage : PgStorage() {
     }
 
     override fun getDictionary(id: String): JbDictionary? {
+        TODO("Not yet implemented")
+    }
+
+    override fun newStreamSession(options: SessionOptions?): IStreamSession {
         TODO("Not yet implemented")
     }
 }

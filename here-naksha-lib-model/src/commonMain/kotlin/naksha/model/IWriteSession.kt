@@ -2,7 +2,12 @@
 
 package naksha.model
 
+import naksha.base.unsupportedOp
 import naksha.model.objects.NakshaTx
+import naksha.model.request.ReadRequest
+import naksha.model.request.Request
+import naksha.model.request.Response
+import naksha.model.request.WriteRequest
 import kotlin.js.JsExport
 
 /**
@@ -10,6 +15,14 @@ import kotlin.js.JsExport
  */
 @JsExport
 interface IWriteSession: IReadSession {
+    /**
+     * Returns the [MemberProcessorMap] for this session.
+     *
+     * Use the map to register, remove, or inspect [IMemberProcessor] instances for individual member processing. Processors are invoked in the order in which they were added.
+     * @return the member processor map.
+     * @since 3.0
+     */
+    val processors: MemberProcessorMap
 
     /**
      * Acquire a storage lock, that is automatically released when the session is [closed][close].
@@ -54,4 +67,25 @@ interface IWriteSession: IReadSession {
      * @since 3.0.0
      */
     fun getTransaction(): NakshaTx?
+
+    /**
+     * Execute the given [WriteRequest].
+     * @param request the request to execute.
+     * @return the response.
+     * @since 2.0.7
+     */
+    fun executeWrite(request: WriteRequest): Response
+
+    /**
+     * Execute the given [Request].
+     * @param request the request to execute.
+     * @return the response.
+     * @since 3.0
+     */
+    @Deprecated("Please use executeRead or executeWrite", level = DeprecationLevel.WARNING)
+    override fun execute(request: Request): Response {
+        if (request is ReadRequest) return this.executeRead(request)
+        if (request is WriteRequest) return this.executeWrite(request)
+        throw unsupportedOp("Unsupported request type: ${request::class.simpleName}")
+    }
 }

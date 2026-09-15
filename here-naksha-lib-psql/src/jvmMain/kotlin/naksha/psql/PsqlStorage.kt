@@ -6,6 +6,7 @@ import naksha.jbon.JbDictionary
 import naksha.model.*
 import naksha.base.NakshaError.NakshaErrorCompanion.ILLEGAL_STATE
 import naksha.base.NakshaError.NakshaErrorCompanion.UNINITIALIZED
+import naksha.base.unsupportedOp
 import kotlin.reflect.KClass
 
 /**
@@ -65,6 +66,10 @@ open class PsqlStorage : PgStorage(), IStorage {
     override fun newSession(options: SessionOptions, readOnly: Boolean): PgSession {
         useInitialized()
         return PgSession(this, options, readOnly)
+    }
+
+    override fun newStreamSession(options: SessionOptions?): IStreamSession {
+        throw unsupportedOp("newStreamSession")
     }
 
     override fun getDictionary(id: String): JbDictionary? = adminCatalog.getDictionary(id)

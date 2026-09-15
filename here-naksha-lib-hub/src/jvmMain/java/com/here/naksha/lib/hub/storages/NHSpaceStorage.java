@@ -20,6 +20,7 @@ package com.here.naksha.lib.hub.storages;
 
 import static com.here.naksha.lib.core.HubInternalIdentifiers.ALL_HUB_INTERNAL_COLLECTIONS;
 import static com.here.naksha.lib.core.exceptions.UncheckedException.unchecked;
+import static naksha.base.NakshaExceptionKt.unsupportedOp;
 
 import com.here.naksha.lib.core.HubInternalIdentifiers;
 import com.here.naksha.lib.core.IEventHandler;
@@ -39,12 +40,7 @@ import naksha.base.PlatformLock;
 import naksha.base.fn.Fn1;
 import naksha.base.fn.Fx1;
 import naksha.jbon.JbDictionary;
-import naksha.model.DataEncoding;
-import naksha.model.IReadSession;
-import naksha.model.IStorage;
-import naksha.model.IWriteSession;
-import naksha.model.NakshaVersion;
-import naksha.model.SessionOptions;
+import naksha.model.*;
 import naksha.model.objects.NakshaStorage;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -163,5 +159,10 @@ public class NHSpaceStorage implements IStorage {
   @Override
   public void runInReadSession(@Nullable SessionOptions options, @NotNull Fx1<IReadSession> lambda) {
     IStorage.super.runInReadSession(options, lambda);
+  }
+
+  @Override
+  public @NotNull IStreamSession newStreamSession(@Nullable SessionOptions options) {
+    throw unsupportedOp("newStreamSession");
   }
 }

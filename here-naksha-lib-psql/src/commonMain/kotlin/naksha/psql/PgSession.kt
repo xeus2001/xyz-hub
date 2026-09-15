@@ -256,6 +256,9 @@ open class PgSession(
 
     private var executionCount: Int = 0
 
+    override fun executeRead(request: ReadRequest): Response = execute(request)
+    override fun executeWrite(request: WriteRequest): Response = execute(request)
+    @Deprecated("Please use executeRead or executeWrite", level = DeprecationLevel.WARNING)
     override fun execute(request: Request): Response {
         try {
             val response = when (request) {
@@ -579,8 +582,6 @@ SELECT * FROM from_hst"""
             pgCatalog.getPgCollectionByNumber(it.conn, collectionNumber)
         }
     }
-
-    override fun executeParallel(request: Request): Response = execute(request)
 
     /**
      * Start time of the session.

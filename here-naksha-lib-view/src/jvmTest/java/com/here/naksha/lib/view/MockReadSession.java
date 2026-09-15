@@ -41,16 +41,9 @@ public class MockReadSession implements IReadSession {
   @Override
   public void close() {}
 
-  @NotNull
   @Override
-  public Response execute(@NotNull Request request) {
+  public @NotNull Response executeRead(@NotNull ReadRequest request) {
     return new SuccessResponse(results);
-  }
-
-  @NotNull
-  @Override
-  public Response executeParallel(@NotNull Request request) {
-    return null;
   }
 
   private int socketTimeout = 0;
@@ -132,14 +125,7 @@ public class MockReadSession implements IReadSession {
     return null;
   }
 
-  @NotNull
-  @Override
-  public MemberProcessorMap getProcessors() {
-    return new MemberProcessorMap();
-  }
-
   @Override
   public void loadTuples(@NotNull List<? extends FeatureTuple> featureTuples, int from, int to) {
-
   }
 }

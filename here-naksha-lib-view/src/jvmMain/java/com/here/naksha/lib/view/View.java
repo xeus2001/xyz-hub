@@ -22,11 +22,14 @@ import kotlin.reflect.KClass;
 import naksha.base.Platform;
 import naksha.jbon.JbDictionary;
 import naksha.model.AbstractStorage;
+import naksha.model.IStreamSession;
 import naksha.model.SessionOptions;
 import naksha.model.objects.NakshaStorage;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static naksha.base.NakshaExceptionKt.unsupportedOp;
 
 // TODO: This should implement IStorage
 public class View extends AbstractStorage<NakshaStorage> implements IView {
@@ -94,5 +97,10 @@ public class View extends AbstractStorage<NakshaStorage> implements IView {
   @Override
   protected void initStorage(@NotNull NakshaStorage nakshaStorage, @Nullable Boolean create, @Nullable Boolean upgrade) {
     // Nothing to do
+  }
+
+  @Override
+  public @NotNull IStreamSession newStreamSession(@Nullable SessionOptions options) {
+    throw unsupportedOp("newStreamSession");
   }
 }

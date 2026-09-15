@@ -822,5 +822,35 @@ return obj;
 
         @JsStatic
         actual fun getTestStorageId(): String = "local_psql_test_storage"
+        actual val FAL: String
+            get() {
+                if (!isPlv8()) return ""
+                return js("""
+(function() {
+    var orig = Error.prepareStackTrace;
+    Error.prepareStackTrace = function(_, stack) { return stack; };
+    var err = new Error();
+    Error.captureStackTrace(err, callerInfo);
+    var frame = err.stack[0];
+    Error.prepareStackTrace = orig;
+    return "[" + frame.getFileName() + ":" + frame.getLineNumber() + "] ";
+})()
+""").unsafeCast<String>()
+            }
+
+        actual fun fal(n: Int): String {
+            if (!isPlv8()) return ""
+            return js("""
+(function() {
+    var orig = Error.prepareStackTrace;
+    Error.prepareStackTrace = function(_, stack) { return stack; };
+    var err = new Error();
+    Error.captureStackTrace(err, callerInfo);
+    var frame = err.stack[Math.max(0, (n||1)-1) || 0];
+    Error.prepareStackTrace = orig;
+    return "[" + frame.getFileName() + ":" + frame.getLineNumber() + "] ";
+})()
+""").unsafeCast<String>()
+        }
     }
 }

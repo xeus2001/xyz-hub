@@ -2,6 +2,7 @@
 
 package naksha.base
 
+import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 
@@ -642,5 +643,46 @@ expect class Platform {
          * @since 3.0
          */
         fun getTestStorageId(): String
+
+        /**
+         * `File-And-Line` - Returns the filename and code line of the caller as string: `[filename:line] `. If not supported on the target platform, returns an empty string.
+         *
+         * Can be added to the start of an exception like:
+         * ```
+         * throw illegalArg("${FAL}Some message")
+         * ```
+         * Resulting in an effective string:
+         * ```
+         * [Foo.kt:123] Some message
+         * ```
+         * This is very helpful for debugging, if not supported on a platform, it becomes just:
+         * ```
+         * Some message
+         * ```
+         * @return the filename and code line of the caller as string or an empty string.
+         * @since 3.0
+         */
+        val FAL: String
+
+        /**
+         * `File-And-Line` - Returns the filename and code line of the caller as string: `[filename:line] `. If not supported on the target platform, returns an empty string.
+         *
+         * Can be added to the start of an exception like:
+         * ```
+         * throw illegalArg("${fal(3)}Some message")
+         * ```
+         * Resulting in an effective string:
+         * ```
+         * [Foo.kt:123] Some message
+         * ```
+         * This is very helpful for debugging, if not supported on a platform, it becomes just:
+         * ```
+         * Some message
+         * ```
+         * @param n the amount of frames to go back, minimally `1` which is the caller.
+         * @return the filename and code line of the caller as string or an empty string.
+         * @since 3.0
+         */
+        fun fal(n: Int): String
     }
 }

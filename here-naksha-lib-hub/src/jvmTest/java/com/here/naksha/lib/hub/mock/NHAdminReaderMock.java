@@ -38,13 +38,7 @@ import naksha.model.objects.NakshaCollection;
 import naksha.model.objects.NakshaFeature;
 import naksha.model.objects.NakshaFeatureList;
 import naksha.model.objects.NakshaCatalog;
-import naksha.model.request.ErrorResponse;
-import naksha.model.request.FeatureTuple;
-import naksha.model.request.ReadFeatures;
-import naksha.model.request.Request;
-import naksha.model.request.RequestQuery;
-import naksha.model.request.Response;
-import naksha.model.request.SuccessResponse;
+import naksha.model.request.*;
 import naksha.model.request.query.ISpatialQuery;
 import naksha.model.request.query.ITagQuery;
 import naksha.model.request.query.SpAnd;
@@ -77,19 +71,13 @@ public class NHAdminReaderMock implements IReadSession {
     this.mockCollection = mockCollection;
   }
 
-  /**
-   * Execute the given read-request.
-   *
-   * @param request
-   * @return the result.
-   */
   @Override
-  public @NotNull Response execute(@NotNull Request request) {
+  public @NotNull Response executeRead(@NotNull ReadRequest request) {
     if (request instanceof ReadFeatures rf) {
       return executeReadFeatures(rf);
     }
     return new ErrorResponse(
-        new NakshaError(NakshaError.ILLEGAL_STATE, "ReadRequest type " + request.getClass().getName() + " not supported"));
+            new NakshaError(NakshaError.ILLEGAL_STATE, "ReadRequest type " + request.getClass().getName() + " not supported"));
   }
 
   protected @NotNull Response executeReadFeatures(@NotNull ReadFeatures rf) {
@@ -259,12 +247,6 @@ public class NHAdminReaderMock implements IReadSession {
     throw new NakshaException(new NakshaError(NakshaError.UNSUPPORTED_OPERATION, "Not supported by mock yet"));
   }
 
-  @NotNull
-  @Override
-  public Response executeParallel(@NotNull Request request) {
-    throw new NakshaException(new NakshaError(NakshaError.UNSUPPORTED_OPERATION, "Not supported by mock yet"));
-  }
-
   @Override
   public @NotNull IStorage getStorage() {
     throw new NakshaException(new NakshaError(NakshaError.UNSUPPORTED_OPERATION, "Not supported by mock yet"));
@@ -304,11 +286,5 @@ public class NHAdminReaderMock implements IReadSession {
   @Override
   public void loadTuples(@NotNull List<? extends FeatureTuple> featureTuples, int from, int to) {
     throw new NakshaException(new NakshaError(NakshaError.UNSUPPORTED_OPERATION, "Not supported by mock yet"));
-  }
-
-  @NotNull
-  @Override
-  public MemberProcessorMap getProcessors() {
-    return new MemberProcessorMap();
   }
 }

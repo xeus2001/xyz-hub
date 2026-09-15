@@ -21,14 +21,10 @@ package com.here.naksha.storage.http;
 import com.here.naksha.lib.core.models.storage.ReadFeaturesProxyWrapper;
 import com.here.naksha.storage.http.connector.ConnectorInterfaceReadExecute;
 import com.here.naksha.storage.http.ffw.FfwInterfaceReadExecute;
+import naksha.base.*;
 import naksha.model.IReadSession;
-import naksha.model.MemberProcessorMap;
 import naksha.model.IStorage;
 import naksha.model.NakshaContext;
-import naksha.base.NakshaError;
-import naksha.base.NakshaException;
-import naksha.base.TupleNumber;
-import naksha.base.Version;
 import naksha.model.SessionOptions;
 import naksha.model.objects.NakshaCollection;
 import naksha.model.objects.NakshaCatalog;
@@ -42,6 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
+import static naksha.base.Platform.javaProxy;
 
 public class HttpStorageReadSession implements IReadSession {
 
@@ -76,22 +75,24 @@ public class HttpStorageReadSession implements IReadSession {
   }
 
   @Override
-  public @NotNull Response execute(@NotNull Request readRequest) {
+  public @NotNull Response executeRead(@NotNull ReadRequest request) {
     try {
-      final ReadFeaturesProxyWrapper request = (ReadFeaturesProxyWrapper) readRequest;
+      final ReadFeaturesProxyWrapper requestWrapper = request instanceof ReadFeaturesProxyWrapper
+            ? (ReadFeaturesProxyWrapper) request : requireNonNull(javaProxy(request, ReadFeaturesProxyWrapper.class));
       final Response response;
       switch (httpInterface) {
         case ffwAdapter:
-          response = FfwInterfaceReadExecute.execute(context, request, requestSender);
+          response = FfwInterfaceReadExecute.execute(context, requestWrapper, requestSender);
           break;
         case dataHubConnector:
-          response = ConnectorInterfaceReadExecute.execute(context, request, requestSender);
+          response = ConnectorInterfaceReadExecute.execute(context, requestWrapper, requestSender);
           break;
         default:
           throw new IllegalStateException("Unsupported HTTP interface: " + httpInterface);
       }
-      return attachVirtualTupleNumbers(response, request);
+      return attachVirtualTupleNumbers(response, requestWrapper);
     } catch (NakshaException exception) {
+      log.info("Unexpected error while executing read", exception);
       return new ErrorResponse(exception.getError());
     } catch (Exception exception) {
       log.warn("We got exception while executing Read request.", exception);
@@ -138,12 +139,6 @@ public class HttpStorageReadSession implements IReadSession {
     // TODO
   }
 
-  @NotNull
-  @Override
-  public Response executeParallel(@NotNull Request request) {
-    return execute(request);
-  }
-
   @Override
   public @NotNull IStorage getStorage() {
     throw new NotImplementedException("Not supported by HTTP storage");
@@ -174,11 +169,6 @@ public class HttpStorageReadSession implements IReadSession {
 
   @Override
   public @NotNull SessionOptions getOptions() {
-    throw new NotImplementedException("Not supported by HTTP storage");
-  }
-
-  @Override
-  public @NotNull MemberProcessorMap getProcessors() {
     throw new NotImplementedException("Not supported by HTTP storage");
   }
 

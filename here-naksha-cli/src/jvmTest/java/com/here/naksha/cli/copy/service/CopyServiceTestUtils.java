@@ -1,9 +1,6 @@
 package com.here.naksha.cli.copy.service;
 
-import naksha.model.ISession;
-import naksha.model.IStorage;
-import naksha.model.IWriteSession;
-import naksha.model.SessionOptions;
+import naksha.model.*;
 import naksha.base.TupleNumber;
 import naksha.base.Version;
 import naksha.model.objects.NakshaFeature;
@@ -87,7 +84,7 @@ public final class CopyServiceTestUtils {
         return sourceStorage;
     }
 
-    public static <T extends Request> List<T> captureRequestsOfType(ISession session, Class<T> type) {
+    public static <T extends Request, S extends IReadSession> List<T> captureRequestsOfType(S session, Class<T> type) {
         ArgumentCaptor<Request> captor = ArgumentCaptor.forClass(Request.class);
         verify(session, atLeastOnce()).execute(captor.capture());
         return captor.getAllValues().stream()

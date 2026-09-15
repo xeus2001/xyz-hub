@@ -4,7 +4,7 @@
 package naksha.base
 
 @JsExport
-actual class NakshaException actual constructor(actual val error: NakshaError) : RuntimeException(error.msg, error.cause) {
+actual open class NakshaException actual constructor(actual val error: NakshaError) : RuntimeException(error.msg, error.cause) {
     @JsName("ofException")
     actual constructor(code: String, msg: String, cause: Throwable?) : this(NakshaError(code, msg, cause))
 

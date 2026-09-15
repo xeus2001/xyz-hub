@@ -29,6 +29,7 @@ import naksha.model.SessionOptions;
 import naksha.model.objects.NakshaCollection;
 import naksha.model.objects.NakshaCatalog;
 import naksha.model.request.FeatureTuple;
+import naksha.model.request.ReadRequest;
 import naksha.model.request.Request;
 import naksha.model.request.Response;
 import org.jetbrains.annotations.ApiStatus;
@@ -77,10 +78,9 @@ public class NHAdminStorageReader implements IReadSession {
     session.setLockTimeout(i);
   }
 
-  @NotNull
   @Override
-  public Response execute(@NotNull Request request) {
-    return session.execute(request);
+  public @NotNull Response executeRead(@NotNull ReadRequest request) {
+    return session.executeRead(request);
   }
 
   @Override
@@ -91,13 +91,6 @@ public class NHAdminStorageReader implements IReadSession {
   @Override
   public void close() {
     session.close();
-  }
-
-  @NotNull
-  @Override
-  public Response executeParallel(@NotNull Request request) {
-    throw new NakshaException(
-        new NakshaError(NakshaError.NOT_IMPLEMENTED, "parallel execution not supported for NHAdmin"));
   }
 
   @Override
@@ -113,11 +106,6 @@ public class NHAdminStorageReader implements IReadSession {
   @Override
   public @Nullable NakshaCatalog getCatalogById(@NotNull String catalogId, boolean allowTombstone) {
     return session.getCatalogById(catalogId, allowTombstone);
-  }
-
-  @Override
-  public @NotNull naksha.model.MemberProcessorMap getProcessors() {
-    return session.getProcessors();
   }
 
   @Override

@@ -20,6 +20,8 @@ import naksha.model.objects.NakshaFeature;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static naksha.base.NakshaExceptionKt.unsupportedOp;
+
 public final class GeneratingStorage extends AbstractStorage<GeneratingStorageConfig> {
     public static final String DEFAULT_IDS_PREFIX = "gen";
     private final JsonParser jsonParser = new JsonParser();
@@ -167,5 +169,10 @@ public final class GeneratingStorage extends AbstractStorage<GeneratingStorageCo
         } catch (IOException e) {
             throw new NakshaException(NakshaError.EXCEPTION, "Problem while loading tileIds from CSV file!", e);
         }
+    }
+
+    @Override
+    public @NotNull IStreamSession newStreamSession(@Nullable SessionOptions options) {
+        throw unsupportedOp("newStreamSession");
     }
 }

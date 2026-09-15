@@ -20,6 +20,7 @@ package com.here.naksha.lib.view;
 
 import naksha.model.ILock;
 import naksha.model.IWriteSession;
+import naksha.model.MemberProcessorMap;
 import naksha.model.SessionOptions;
 import naksha.model.objects.NakshaTx;
 import naksha.model.request.*;
@@ -49,25 +50,25 @@ public class ViewWriteSession extends ViewReadSession implements IWriteSession {
   }
 
   @Override
-  public @NotNull Response execute(@NotNull Request request) {
+  public @NotNull Response executeRead(@NotNull ReadRequest request) {
     ensureSessionInitialized();
-    if (request instanceof WriteRequest) {
-      final var writeRequest = (WriteRequest) request;
-      for (Write write : writeRequest.getWrites()) {
-        if(write.getOp().equals(WriteOp.UPDATE)){
-          write.withOp(WriteOp.UPSERT);
-        }
-        write.withMapId(writeLayer.getMapId());
-        write.withCollectionId(writeLayer.getCollectionId());
+    final ReadFeatures readFeatures = (ReadFeatures) request;
+    readFeatures.setCatalogId(writeLayer.getMapId());
+    readFeatures.setCollectionId(writeLayer.getCollectionId());
+    return this.session.executeRead(request);
+  }
+
+  @Override
+  public @NotNull Response executeWrite(@NotNull WriteRequest request) {
+    ensureSessionInitialized();
+    for (Write write : request.getWrites()) {
+      if(write.getOp().equals(WriteOp.UPDATE)){
+        write.withOp(WriteOp.UPSERT);
       }
-    } else if (request instanceof ReadFeatures) {
-      final ReadFeatures readFeatures = (ReadFeatures) request;
-      readFeatures.setCatalogId(writeLayer.getMapId());
-      readFeatures.setCollectionId(writeLayer.getCollectionId());
-    } else {
-      throw new IllegalArgumentException("Unsupported request type: " + request.getClass());
+      write.withMapId(writeLayer.getMapId());
+      write.withCollectionId(writeLayer.getCollectionId());
     }
-    return this.session.execute(request);
+    return this.session.executeWrite(request);
   }
 
   @Override
@@ -115,5 +116,12 @@ public class ViewWriteSession extends ViewReadSession implements IWriteSession {
   @Override
   public @Nullable NakshaTx getTransaction() {
     return getSession().getTransaction();
+  }
+
+  private final @NotNull MemberProcessorMap processors = new MemberProcessorMap();
+
+  @Override
+  public @NotNull MemberProcessorMap getProcessors() {
+    return processors;
   }
 }

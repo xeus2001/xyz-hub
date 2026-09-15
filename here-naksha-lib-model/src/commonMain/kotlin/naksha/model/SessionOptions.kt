@@ -90,7 +90,7 @@ data class SessionOptions @JvmOverloads constructor(
     val socketTimeout: Int = NakshaContext.currentContext().socketTimeout,
 
     /**
-     * The statement-timeout in milliseconds, this means how long to wait for each CREATE, UPDATE or DELETE to be executed.
+     * The statement/request-timeout in milliseconds, this means how long to wait for each CREATE, UPDATE or DELETE to be executed.
      * @since 3.0
      */
     @JvmField

@@ -22,18 +22,15 @@ import naksha.base.PlatformLock;
 import naksha.base.fn.Fn1;
 import naksha.base.fn.Fx1;
 import naksha.jbon.JbDictionary;
-import naksha.model.DataEncoding;
-import naksha.model.IReadSession;
-import naksha.model.IStorage;
-import naksha.model.IWriteSession;
+import naksha.model.*;
 import naksha.base.NakshaError;
 import naksha.base.NakshaException;
-import naksha.model.NakshaVersion;
-import naksha.model.SessionOptions;
 import naksha.model.objects.NakshaStorage;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static naksha.base.NakshaExceptionKt.unsupportedOp;
 
 public class NHAdminStorage implements IStorage {
 
@@ -119,5 +116,10 @@ public class NHAdminStorage implements IStorage {
   @Override
   public void runInReadSession(@Nullable SessionOptions options, @NotNull Fx1<IReadSession> lambda) {
     IStorage.super.runInReadSession(options, lambda);
+  }
+
+  @Override
+  public @NotNull IStreamSession newStreamSession(@Nullable SessionOptions options) {
+    throw unsupportedOp("newStreamSession");
   }
 }

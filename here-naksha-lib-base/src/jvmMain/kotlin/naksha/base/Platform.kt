@@ -876,5 +876,17 @@ actual class Platform {
             val id = System.getenv("NAKSHA_TEST_STORAGE_ID");
             return if(id.isNullOrEmpty()) "local_psql_test_storage" else id
         }
+
+        @get:JvmName("FAL")
+        actual val FAL: String
+            get() {
+                val frame = StackWalker.getInstance().walk { it.skip(1).findFirst().get() }
+                return "[${frame.fileName}:${frame.lineNumber}] "
+            }
+
+        actual fun fal(n: Int): String {
+            val frame = StackWalker.getInstance().walk { it.skip(1).findFirst().get() }
+            return "[${frame.fileName}:${frame.lineNumber}] "
+        }
     }
 }

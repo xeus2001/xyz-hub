@@ -24,12 +24,9 @@ import com.here.naksha.lib.core.INaksha;
 import com.here.naksha.lib.core.models.naksha.Space;
 import com.here.naksha.lib.core.models.naksha.SpaceProperties;
 import com.here.naksha.lib.hub.EventPipelineFactory;
-import naksha.model.ILock;
-import naksha.model.IWriteSession;
+import naksha.model.*;
 import naksha.base.NakshaError;
 import naksha.base.NakshaException;
-import naksha.model.NakshaVersion;
-import naksha.model.SessionOptions;
 import naksha.model.objects.NakshaCollection;
 import naksha.model.objects.NakshaTx;
 import naksha.model.request.ErrorResponse;
@@ -52,11 +49,12 @@ import java.util.Objects;
 import static com.here.naksha.lib.core.HubInternalIdentifiers.SPACES;
 import static com.here.naksha.lib.handlers.util.RequestTypesUtil.isOnlyWriteCollections;
 import static com.here.naksha.lib.handlers.util.RequestTypesUtil.isOnlyWriteFeatures;
+import static naksha.base.NakshaError.UNSUPPORTED_OPERATION;
 
 public class NHSpaceStorageWriter extends NHSpaceStorageReader implements IWriteSession {
 
   private static final NakshaException NOT_SUPPORTED_ERROR = new NakshaException(
-      new NakshaError(NakshaError.UNSUPPORTED_OPERATION, "Operation not supported by NHSpaceStorageWriter"));
+      new NakshaError(UNSUPPORTED_OPERATION, "Operation not supported by NHSpaceStorageWriter"));
 
   private static final Logger logger = LoggerFactory.getLogger(NHSpaceStorageWriter.class);
 
@@ -69,24 +67,18 @@ public class NHSpaceStorageWriter extends NHSpaceStorageReader implements IWrite
     super(hub, virtualSpaces, pipelineFactory, sessionOptions);
   }
 
-  @NotNull
   @Override
-  public Response execute(@NotNull Request request) {
-    if (request instanceof WriteRequest writeRequest) {
-      if (isOnlyWriteCollections(writeRequest)) {
-        return executeSingleCollectionWrite(writeRequest);
-      } else if (isOnlyWriteFeatures(writeRequest)) {
-        return executeWriteFeatures(writeRequest);
-      } else {
-        return new ErrorResponse(
-            NakshaError.UNSUPPORTED_OPERATION,
-            "Only single collection writes and pure write features writes are supported");
-      }
+  public @NotNull Response executeWrite(@NotNull WriteRequest request) {
+    if (isOnlyWriteCollections(request)) {
+      return executeSingleCollectionWrite(request);
+    } else if (isOnlyWriteFeatures(request)) {
+      return executeWriteFeatures(request);
+    } else {
+      return new ErrorResponse(
+        UNSUPPORTED_OPERATION,
+        "Only single collection writes and pure write features writes are supported"
+      );
     }
-    return new ErrorResponse(
-        NakshaError.UNSUPPORTED_OPERATION,
-        "Supported type: " + WriteRequest.class.getName() + ", got "
-        + request.getClass().getName() + " instead");
   }
 
   private @NotNull Response executeSingleCollectionWrite(final @NotNull WriteRequest writeRequest) {
@@ -252,13 +244,6 @@ public class NHSpaceStorageWriter extends NHSpaceStorageReader implements IWrite
     throw NOT_SUPPORTED_ERROR;
   }
 
-  @NotNull
-  @Override
-  public Response executeParallel(@NotNull Request request) {
-    throw new NakshaException(
-        new NakshaError(NakshaError.NOT_IMPLEMENTED, "parallel execution not supported for NHSpace"));
-  }
-
   @Override
   public @NotNull ILock acquireSessionLock(@NotNull String lockId) {
     throw NOT_SUPPORTED_ERROR;
@@ -277,5 +262,12 @@ public class NHSpaceStorageWriter extends NHSpaceStorageReader implements IWrite
   @Override
   public @Nullable NakshaTx getTransaction() {
     throw NOT_SUPPORTED_ERROR;
+  }
+
+  private final @NotNull MemberProcessorMap processors = new MemberProcessorMap();
+
+  @Override
+  public @NotNull MemberProcessorMap getProcessors() {
+    return processors;
   }
 }

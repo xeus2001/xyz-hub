@@ -27,9 +27,8 @@ final class GeneratingSession implements IReadSession {
         this.templateFeature = templateFeature;
     }
 
-    @NotNull
     @Override
-    public Response execute(@NotNull Request request) {
+    public @NotNull Response executeRead(@NotNull ReadRequest request) {
         GeneratingStorageService service = storage.getService();
         FeatureTupleList featureTuples = service.generateDummyFeatureTuples(storage.getNumber(), storage.getNumOfFeaturesToGenerate());
         return new SuccessResponse(featureTuples);
@@ -49,12 +48,6 @@ final class GeneratingSession implements IReadSession {
             NakshaFeature feature = generatedFeatures.get(i);
             featureTuple.setFeature(feature);
         }
-    }
-
-    @NotNull
-    @Override
-    public Response executeParallel(@NotNull Request request) {
-        return execute(request);
     }
 
     @NotNull
@@ -142,8 +135,4 @@ final class GeneratingSession implements IReadSession {
     }
 
     private final MemberProcessorMap processors = new MemberProcessorMap();
-    @Override
-    public @NotNull MemberProcessorMap getProcessors() {
-      return processors;
-    }
 }

@@ -15,6 +15,7 @@ import naksha.base.NakshaError.NakshaErrorCompanion.ILLEGAL_STATE
 import naksha.base.NakshaError.NakshaErrorCompanion.CATALOG_EXISTS
 import naksha.base.NakshaError.NakshaErrorCompanion.INTERNAL_ERROR
 import naksha.base.NakshaError.NakshaErrorCompanion.MAP_NOT_FOUND
+import naksha.base.NakshaError.NakshaErrorCompanion.NOT_IMPLEMENTED
 import naksha.base.NakshaError.NakshaErrorCompanion.UNSUPPORTED_OPERATION
 
 /**
@@ -22,7 +23,7 @@ import naksha.base.NakshaError.NakshaErrorCompanion.UNSUPPORTED_OPERATION
  * @property error the error that happened.
  * @since 3.0
  */
-expect class NakshaException : RuntimeException {
+expect open class NakshaException : RuntimeException {
     /**
      * The [NakshaError] that causes this exception.
      * @since 3.0
@@ -172,6 +173,15 @@ fun conflict(msg: String): NakshaException = NakshaException(CONFLICT, msg)
  * @param msg the message.
  * @return the [NakshaException].
  * @since 3.0
+ * @see notImplemented
  */
 fun unsupportedOp(msg: String): NakshaException = NakshaException(UNSUPPORTED_OPERATION, msg)
 
+/**
+ * Create [NOT_IMPLEMENTED] exception
+ * @param msg the message.
+ * @return the [NakshaException].
+ * @since 3.0
+ * @see unsupportedOp
+ */
+fun notImplemented(msg: String): NakshaException = NakshaException(NOT_IMPLEMENTED, msg)

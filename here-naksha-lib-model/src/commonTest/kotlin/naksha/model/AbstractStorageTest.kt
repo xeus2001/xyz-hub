@@ -121,6 +121,7 @@ class AbstractStorageTest {
         override fun shutdownStorage(dropCache: Boolean) = Unit
         override fun newWriteSession(options: SessionOptions?): IWriteSession = error("Not used by this test")
         override fun newReadSession(options: SessionOptions?): IReadSession = error("Not used by this test")
+        override fun newStreamSession(options: SessionOptions?): IStreamSession = error("Not used by this test")
     }
 
     private class TestStorage : AbstractStorage<NakshaStorage>() {
@@ -178,5 +179,6 @@ class AbstractStorageTest {
         override fun shutdownStorage(dropCache: Boolean) = Unit
         override fun newWriteSession(options: SessionOptions?): IWriteSession = error("Not used by this test")
         override fun newReadSession(options: SessionOptions?): IReadSession = error("Not used by this test")
+        override fun newStreamSession(options: SessionOptions?): IStreamSession = error("Not used by this test")
     }
 }

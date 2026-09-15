@@ -80,12 +80,12 @@ public class ViewReadSession implements IReadSession, AutoCloseable {
   }
 
   @Override
-  public @NotNull Response execute(@NotNull Request readRequest) {
-    if (!(readRequest instanceof ReadFeatures)) {
+  public @NotNull Response executeRead(@NotNull ReadRequest request) {
+    if (!(request instanceof ReadFeatures)) {
       throw new UnsupportedOperationException("Only ReadFeatures are supported.");
     }
     return executeReadFeatures(
-        (ReadFeatures) readRequest,
+        (ReadFeatures) request,
         new MergeByStoragePriority(),
         new ObligatoryLayersResolver(Set.of(view.getViewCollection().getTopPriorityLayer()))
     );
@@ -229,12 +229,6 @@ public class ViewReadSession implements IReadSession, AutoCloseable {
     return false;
   }
 
-  @NotNull
-  @Override
-  public Response executeParallel(@NotNull Request request) {
-    return execute(request);
-  }
-
   @Override
   public void loadTuples(@NotNull List<? extends FeatureTuple> featureTuples, int from, int to) {
     final ViewLayerCollection viewCollection = view.getViewCollection();
@@ -287,11 +281,6 @@ public class ViewReadSession implements IReadSession, AutoCloseable {
 
   @Override
   public @NotNull SessionOptions getOptions() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public @NotNull MemberProcessorMap getProcessors() {
     throw new UnsupportedOperationException();
   }
 }

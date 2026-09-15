@@ -146,7 +146,7 @@ public class ViewTest {
 //    when(storage.tupleToFeature(any())).thenReturn(feature);
 
     Response success = new SuccessResponse(sampleXyzWriteResponse(1, Action.CREATE));
-    when(session.execute(request)).thenReturn(success);
+    when(session.executeWrite(request)).thenReturn(success);
     ViewWriteSession writeSession = view.newWriteSession(sessionOptions);
     Response response = writeSession.execute(request);
     assertInstanceOf(SuccessResponse.class, response);
@@ -171,7 +171,7 @@ public class ViewTest {
     final NakshaFeature feature = new NakshaFeature("0");
     request.add(write.deleteFeatureById(topologiesDS.getMapId(), topologiesDS.getCollectionId(), feature.getId()));
     SuccessResponse successResponse1 = new SuccessResponse(sampleXyzWriteResponse(1, Action.DELETE));
-    when(session.execute(request)).thenReturn(successResponse1);
+    when(session.executeWrite(request)).thenReturn(successResponse1);
     ViewWriteSession writeSession = view.newWriteSession(sessionOptions);
 
     Response response = writeSession.execute(request);
